@@ -10,7 +10,7 @@ def test_path(row_inc, col_inc, lines)
         adjusted_col = cur_col % num_cols
         char = lines[cur_row][adjusted_col]
 
-        print "Row: #{cur_row}, Col: #{adjusted_col}, Char: #{char}\n";
+#        print "Row: #{cur_row}, Col: #{adjusted_col}, Char: #{char}\n";
 
         if (char == '#')
             tree_count += 1
@@ -24,5 +24,10 @@ def test_path(row_inc, col_inc, lines)
 end
 
 lines = File.read("input_3.txt").split
+paths = [[1, 1], [3, 1], [5, 1], [7, 1], [1, 2]];
 
-test_path(1, 3, lines)
+result = 1
+for path in paths
+    result *= test_path(path[1], path[0], lines)
+end
+print "Result: #{result}\n"

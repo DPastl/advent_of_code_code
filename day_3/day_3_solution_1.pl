@@ -14,7 +14,7 @@ $cur_row = 0;
 
 $tree_count = 0;
 
-while ($cur_row < $num_rows){
+while ($cur_row <= $num_rows){
     $adjusted_col = $cur_col % $num_cols;
     $char = substr($lines[$cur_row], $adjusted_col, 1);
 
