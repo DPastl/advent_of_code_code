@@ -10,16 +10,9 @@ function decodeRow() {
 function decodeSeat() {
     r1=${1//R/1}
     result=${r1//L/0}
-    # echo "Binary Result: $result"
     dresult=$((2#$result))
-    # echo "Decimal Result: $dresult"
     echo $dresult
 }
-
-#line="BBFFBBFRLL"
-#row="$(decodeRow ${line:0:7})"
-#seat="$(decodeSeat ${line:(-3):3})"
-#echo "Binary $line is Row $row, Seat $seat"
 
 high_id=0
 filename="input_5.txt"
