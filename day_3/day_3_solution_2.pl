@@ -25,11 +25,11 @@ sub test_path{
         $cur_row += $row_increment;
         $cur_col += $col_increment;
     }
-    print "Tree Count: $tree_count\n";_2
+    print "Tree Count: $tree_count\n";
     return $tree_count;
 }
 
-open(inputfile, "input.txt");
+open(inputfile, "input_3.txt");
 chomp(my @lines = <inputfile>);
 
 @paths = ([1, 1], [3, 1], [5, 1], [7, 1], [1, 2]);
