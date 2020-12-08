@@ -24,7 +24,7 @@ def create_tree(rule_hash, starting_bag)
     return key_list
 end
 
-lines = File.readlines("test_input.txt").map(&:chomp)
+lines = File.readlines("input_7.txt").map(&:chomp)
 
 rule_hash = {}
 for line in lines
