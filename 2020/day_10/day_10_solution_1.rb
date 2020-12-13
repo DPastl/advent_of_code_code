@@ -1,4 +1,4 @@
-lines = File.readlines('input_10.txt').map{|str| str.to_i}
+lines = File.readlines('test_file_2.txt').map{|str| str.to_i}
 lines.push(lines.max+3)
 
 sorted_adapter_list = lines.sort

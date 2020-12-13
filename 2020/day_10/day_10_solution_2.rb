@@ -1,24 +1,27 @@
-def count_choices(list, start)
-    start_val = list[start]
-    possibilities = 0
-    index = start+1
-    while index < list.length and list[index]-start_val < 4
-        possibilities += 1
-        index += 1
-    end
-    return possibilities
-end
-
-lines = File.readlines('test_file_1.txt').map{|str| str.to_i}
+lines = File.readlines('input_10.txt').map{|str| str.to_i}
 lines.push(lines.max+3)
-lines.push(0)
 
 sorted_adapter_list = lines.sort
 print "#{sorted_adapter_list}\n"
-combinations = 1
-for index in 0..sorted_adapter_list.length-2
-    choices = count_choices(sorted_adapter_list, index)
-    combinations *= choices
-    print "Combinations: #{combinations}, Adapter: #{sorted_adapter_list[index]}, Choices: #{choices}\n"
+jolt_diff_count = []
+traversal_count = [1, 1, 2, 4, 7]
+successive_list = []
+
+last_jolt = 0
+count = 0
+options = 1
+for device in sorted_adapter_list
+    jolt_diff_count.push(device-last_jolt)
+    if device-last_jolt == 3
+        successive_list.push(count)
+        options *= traversal_count[count]
+        count = 0
+    else
+        count += 1
+    end
+    last_jolt = device
 end
-print "Combinations: #{combinations}\n"
+
+print "#{options}\n"
+print("successive_list: #{successive_list}\n")
+print "Jolt Differences: #{jolt_diff_count}\n"
