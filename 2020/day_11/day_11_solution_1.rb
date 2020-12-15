@@ -44,7 +44,6 @@ def update_seating(seating)
         for column in 0..seating[0].length-1
             unless seating[row][column] == FLOOR
                 nearby_count = count_adjacent(seating, row, column)
-                # print "Row: #{row}, Column: #{column}, Count: #{nearby_count}\n"
                 if nearby_count == 0 and seating[row][column] != OCCUPIED_SEAT
                     new_seating[row][column] = OCCUPIED_SEAT
                     change_count += 1
@@ -58,22 +57,11 @@ def update_seating(seating)
     return new_seating, change_count
 end
 
-seating = File.readlines("test_file.txt").map{|str| str.chomp}.map{|str| str.chars}
-
-# print "Length: #{seating.length}, Width: #{seating[0].length}\n"
-# print "adjacent_count: #{count_adjacent(seating, 0, 0)}\n"
-
-# print_seating(seating)
-# print "Next\n"
-# new_seating, change_count = update_seating(seating)
-# print_seating(new_seating)
-# print "Change Count: #{change_count}\n"
+seating = File.readlines("input_11.txt").map{|str| str.chomp}.map{|str| str.chars}
 
 changes = 1
 iterations = 0
-while changes != 0 and iterations < 10
-    # print "Next\n"
-    # print_seating(seating)
+while changes != 0 and iterations < 100
     seating, changes = update_seating(seating)
     iterations += 1
 end
