@@ -1,85 +1,145 @@
 # North is positive y, South is negative  y
 # East is positive x, West is negative x
-Position = Struct.new(:direction, :x, :y)
-
 
 def decode(instruction)
     retval = instruction.match(/(\D)(\d+)/)
     return retval[1], retval[2].to_i
 end
 
-def update_direction(current_direction, turn_direction, angle)
-    # Cardinal directions incrementing with increasing angle clockwise
-    # So if turning right, increment index, if left, decrement
-    cardinal_directions = ['N', 'E', 'S', 'W']
-    current_index = cardinal_directions.index(current_direction)
-    increment = angle / 90
-    new_index = 0
+def rotate_waypoint(waypoint, turn_direction, angle)
+    # Rotate waypoint about ship, which is just swapping axes
+    new_waypoint = [0, 0]
     if turn_direction == 'R'
-        new_index = (current_index + increment)%4
-    else
-        new_index = (current_index - increment)%4
+        angle *= -1
     end
-    return cardinal_directions[new_index]
+    angle_r = Math::PI * angle / 180
+    new_waypoint[0] = (waypoint[0]*Math.cos(angle_r)-waypoint[1]*Math.sin(angle_r)).round
+    new_waypoint[1] = (waypoint[0]*Math.sin(angle_r)+waypoint[1]*Math.cos(angle_r)).round
+    return new_waypoint
 end
 
-def move(i_type, i_val, current_pos)
+def move(i_type, i_val, waypoint, ship)
     case i_type
     when 'N'
-        current_pos[:y] += i_val
+        return [waypoint[0], waypoint[1] + i_val], ship
     when 'S'
-        current_pos[:y] -= i_val
+        return [waypoint[0], waypoint[1] - i_val], ship
     when 'E'
-        current_pos[:x] += i_val
+        return [waypoint[0] + i_val, waypoint[1]], ship
     when 'W'
-        current_pos[:x] -= i_val
+        return [waypoint[0] - i_val, waypoint[1]], ship
     when 'L'
-        current_pos[:direction] = update_direction(current_pos[:direction], i_type, i_val)
+        return rotate_waypoint(waypoint, i_type, i_val), ship
     when 'R'
-        current_pos[:direction] = update_direction(current_pos[:direction], i_type, i_val)
+        return rotate_waypoint(waypoint, i_type, i_val), ship
     when 'F'
-        current_pos = move(current_pos[:direction], i_val, current_pos)
+        return waypoint, [ship[0] + waypoint[0]*i_val, ship[1] + waypoint[1]*i_val]
     else
         print "Error decoding instruction"
+        return [0, 0], [0, 0]
     end
 end
 
 def navigate(lines)
-    current_pos = Position.new('E', 0, 0)
+    # Waypoint is relative to ship, not absolute
+    waypoint = [10, 1]
+    ship = [0, 0]
     for instruction in lines
         i_type, i_val = decode(instruction)
-        move(i_type, i_val, current_pos)
-        puts current_pos
+        # print "#{waypoint}, #{ship}, #{i_type}, #{i_val}\n"
+        waypoint, ship = move(i_type, i_val, waypoint, ship)
+
+        # print "Ship:\n"
+        # print_position(ship)
+        # print "Waypoint:\n"
+        # print_position(waypoint)
     end
-    return current_pos
+    return waypoint, ship
 end
 
 def print_position(current_pos)
-    print_string = "Direction: #{current_pos[:direction]}, "
-    if current_pos[:x] > 0
-        print_string += "East #{current_pos[:x]}, "
+    print_string = ""
+    if current_pos[0] > 0
+        print_string += "East #{current_pos[0]}, "
     else
-        print_string += "West #{-current_pos[:x]}, "
+        print_string += "West #{-current_pos[0]}, "
     end
-    if current_pos[:y] > 0
-        print_string += "North #{current_pos[:y]}\n"
+    if current_pos[1] > 0
+        print_string += "North #{current_pos[1]}\n"
     else
-        print_string += "South #{-current_pos[:y]}\n"
+        print_string += "South #{-current_pos[1]}\n"
     end
     print print_string
 end
 
 def calc_manhatten(current_pos)
-    return current_pos[:x].abs + current_pos[:y].abs
+    return current_pos[0].abs + current_pos[1].abs
 end
 
+def check_position(waypoint, x_expec, y_expec)
+    if waypoint[0] == x_expec and waypoint[1] == y_expec
+        return true
+    else
+        print "Expect #{x_expec}, #{y_expec}.  Found: #{waypoint[0]}, #{waypoint[1]}\n"
+        return false
+    end
+end
+
+def validate_move()
+    # n_way, n_ship = move('N', 10, [0, 0], [0, 0])
+    puts check_position(n_way, 0, 10)
+    puts check_position(n_ship, 0, 0)
+
+    n_way, n_ship = move('S', 10, [0, 0], [0, 0])
+    puts check_position(n_way, 0, -10)
+    puts check_position(n_ship, 0, 0)
+
+    n_way, n_ship = move('E', 10, [0, 0], [0, 0])
+    puts check_position(n_way, 10, 0)
+    puts check_position(n_ship, 0, 0)
+
+    n_way, n_ship = move('W', 10, [0, 0], [0, 0])
+    puts check_position(n_way, -10, 0)
+    puts check_position(n_ship, 0, 0)
+
+    n_way, n_ship = move('L', 90, [0, 10], [0, 0])
+    puts check_position(n_way, -10, 0)
+    puts check_position(n_ship, 0, 0)
+
+    n_way, n_ship = move('R', 90, [0, 10], [0, 0])
+    puts check_position(n_way, 10, 0)
+    puts check_position(n_ship, 0, 0)
+
+    n_way, n_ship = move('L', 180, [0, 10], [0, 0])
+    puts check_position(n_way, 0, -10)
+    puts check_position(n_ship, 0, 0)
+
+    n_way, n_ship = move('R', 180, [0, 10], [0, 0])
+    puts check_position(n_way, 0, -10)
+    puts check_position(n_ship, 0, 0)
+
+    n_way, n_ship = move('F', 10, [1, 1], [0, 0])
+    puts check_position(n_way, 1, 1)
+    puts check_position(n_ship, 10, 10)
+
+    n_way, n_ship = move('F', 10, [1, -1], [0, 0])
+    puts check_position(n_way, 1, -1)
+    puts check_position(n_ship, 10, -10)
+
+    n_way, n_ship = move('F', 10, [-1, -1], [0, 0])
+    puts check_position(n_way, -1, -1)
+    puts check_position(n_ship, -10, -10)
+
+    n_way, n_ship = move('F', 10, [-1, 1], [0, 0])
+    puts check_position(n_way, -1, 1)
+    puts check_position(n_ship, -10, 10)
+
+end
+
+# validate_move()
 
 lines = File.readlines('input_12.txt').map{|str| str.chomp}
-# current_pos = Position.new('E', 0, 0)
-# i_type, i_val = decode(lines[0])
-# move(i_type, i_val, current_pos)
-# puts current_pos
 
-endpoint = navigate(lines)
-print_position(endpoint)
-print "Distance: #{calc_manhatten(endpoint)}\n"
+waypoint, ship = navigate(lines)
+# print_position(ship)
+print "Distance: #{calc_manhatten(ship)}\n"
